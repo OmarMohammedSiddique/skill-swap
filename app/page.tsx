@@ -2,58 +2,84 @@
 
 import { useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
+import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card"
 
 export default function Home() {
   const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
   const supabase = createClient()
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const { error } = await supabase.auth.signInWithOtp({
+  const handleSignUp = async () => {
+    setLoading(true)
+    // 1. Sign up the user
+    const { error } = await supabase.auth.signUp({
       email,
-      options: {
-        // This redirects them back to your site after clicking the email link
-        emailRedirectTo: `${location.origin}/auth/callback`,
-      },
+      password,
+    })
+
+    if (error) {
+      alert("Signup Error: " + error.message)
+    } else {
+      // 2. Go straight to dashboard
+      router.push('/dashboard')
+    }
+    setLoading(false)
+  }
+
+  const handleLogin = async () => {
+    setLoading(true)
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     })
     
     if (error) {
-      alert(error.message)
+      alert("Login Error: " + error.message)
     } else {
-      setSent(true)
+      router.push('/dashboard')
     }
+    setLoading(false)
   }
 
   return (
-    <div className="flex h-screen w-full flex-col items-center justify-center bg-slate-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">SkillSwap</CardTitle>
-          <CardDescription>Enter your email to start swapping skills.</CardDescription>
+    <div className="flex h-screen w-full items-center justify-center bg-slate-50 p-4">
+      <Card className="w-full max-w-md shadow-lg border-t-4 border-blue-600">
+        <CardHeader className="space-y-1">
+          {/* v2 TAG TO PROVE IT UPDATED */}
+          <CardTitle className="text-2xl font-bold text-center">SkillSwap v2</CardTitle>
+          <CardDescription className="text-center">
+            Enter your email and password
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          {sent ? (
-            <div className="text-green-600 text-center font-medium">
-              Check your email! We sent you a magic link.
-            </div>
-          ) : (
-            <form onSubmit={handleLogin} className="flex flex-col gap-4">
-              <Input 
-                type="email" 
-                placeholder="strathmore@edu.ke" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <Button type="submit" className="w-full">
-                Send Magic Link
-              </Button>
-            </form>
-          )}
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Input 
+              type="email" 
+              placeholder="name@example.com" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Input 
+              type="password" 
+              placeholder="Password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            <Button onClick={handleLogin} disabled={loading} className="w-full bg-slate-900">
+              {loading ? '...' : 'Log In'}
+            </Button>
+            <Button onClick={handleSignUp} disabled={loading} variant="outline" className="w-full">
+              Sign Up (No Email Needed)
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
