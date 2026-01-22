@@ -2,7 +2,6 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 
 export default async function Dashboard() {
   const supabase = await createClient()
@@ -34,7 +33,7 @@ export default async function Dashboard() {
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8 bg-slate-50 min-h-screen">
       
-      {/* Header Section with Sign Out */}
+      {/* Header Section - Cleaned Up */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b pb-6">
         <div>
           <h1 className="text-4xl font-bold tracking-tight text-slate-900">SkillSwap Board</h1>
@@ -43,17 +42,7 @@ export default async function Dashboard() {
             {' '}and you teach <span className="font-bold text-green-600">{iCanTeach}</span>.
           </p>
         </div>
-        
-        <div className="flex items-center gap-4">
-          <a href="/setup" className="text-sm text-slate-500 hover:text-slate-900 underline">
-            Edit skills
-          </a>
-          <form action="/auth/signout" method="post">
-            <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700">
-              Sign Out
-            </Button>
-          </form>
-        </div>
+        {/* Buttons removed here because they are now in your Navbar! */}
       </div>
 
       <div className="grid gap-6">
