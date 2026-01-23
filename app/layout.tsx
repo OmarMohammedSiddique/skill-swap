@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "SkillSwap",
-  description: "Swap skills, not bills.",
+  description: "Swap skills, not bills",
 };
 
 export default function RootLayout({
