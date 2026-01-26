@@ -24,20 +24,20 @@ export default function ExplorePage() {
     ];
 
     return (
-        <div className="flex flex-col min-h-screen bg-slate-50">
+        <div className="flex flex-col min-h-screen bg-muted/50">
             <Navbar />
             {/* Header */}
-            <div className="bg-white border-b">
+            <div className="bg-background border-b border-border">
                 <div className="container mx-auto px-4 py-12 text-center max-w-4xl">
-                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 mb-4">
+                    <h1 className="text-4xl font-extrabold tracking-tight text-foreground mb-4">
                         Explore Skills
                     </h1>
-                    <p className="text-xl text-slate-600 mb-8">
+                    <p className="text-xl text-muted-foreground mb-8">
                         Discover skills you can learn from our community members.
                     </p>
 
                     <div className="relative max-w-xl mx-auto">
-                        <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                        <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                         <Input
                             placeholder="Search for skills (e.g. Python, Piano, Cooking)..."
                             className="pl-10 h-12 text-lg shadow-sm"
@@ -46,7 +46,7 @@ export default function ExplorePage() {
 
                     <div className="flex flex-wrap justify-center gap-2 mt-6">
                         {categories.map((cat) => (
-                            <Button key={cat.name} variant="outline" size="sm" className="gap-2 rounded-full">
+                            <Button key={cat.name} variant="outline" size="sm" className="gap-2 rounded-full text-foreground hover:bg-muted">
                                 {cat.icon}
                                 {cat.name}
                             </Button>
@@ -57,21 +57,21 @@ export default function ExplorePage() {
 
             {/* Content */}
             <div className="container mx-auto px-4 py-12">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">Featured Opportunities</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-6">Featured Opportunities</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {featuredSkills.map((skill, index) => (
-                        <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all cursor-pointer">
+                        <div key={index} className="bg-card p-6 rounded-xl shadow-sm border border-border hover:shadow-md transition-all cursor-pointer">
                             <div className="flex justify-between items-start mb-4">
-                                <Badge variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200">
+                                <Badge variant="secondary" className="bg-muted text-muted-foreground hover:bg-muted/80">
                                     {skill.category}
                                 </Badge>
-                                <span className="text-xs font-medium text-slate-500 bg-slate-50 px-2 py-1 rounded">
+                                <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
                                     {skill.level}
                                 </span>
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-2">{skill.title}</h3>
-                            <p className="text-slate-500 text-sm mb-4">Offered by {skill.user}</p>
-                            <Button className="w-full variant-outline">View Details</Button>
+                            <h3 className="text-xl font-bold text-foreground mb-2">{skill.title}</h3>
+                            <p className="text-muted-foreground text-sm mb-4">Offered by {skill.user}</p>
+                            <Button className="w-full text-foreground" variant="outline">View Details</Button>
                         </div>
                     ))}
                 </div>

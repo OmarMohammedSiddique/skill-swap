@@ -22,6 +22,8 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { BrandLogo } from "@/components/brand-logo";
 
 // --- COMPONENTS MOVED OUTSIDE ---
 
@@ -34,43 +36,40 @@ const Navbar = ({
   scrollToStories,
 }: any) => (
   <nav
-    className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-white/80 backdrop-blur-md border-b border-slate-200 py-3" : "bg-transparent py-5"}`}
+    className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-background/80 backdrop-blur-md border-b border-border py-3" : "bg-transparent py-5"}`}
   >
     <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
       <div
-        className="flex items-center gap-2 font-bold text-xl cursor-pointer text-slate-900"
         onClick={() => navigateTo("landing")}
       >
-        <div className="bg-indigo-600 p-1.5 rounded-lg text-white">
-          <RefreshCw size={20} />
-        </div>
-        <span>SkillSwap</span>
+        <BrandLogo />
       </div>
 
       {/* Desktop Nav */}
       <div className="hidden md:flex items-center gap-8">
         <Link
           href="/how-it-works"
-          className="text-sm font-medium text-slate-600 hover:text-indigo-600"
+          className="text-sm font-medium text-muted-foreground hover:text-indigo-600"
         >
           How it Works
         </Link>
         <Link
           href="/explore"
-          className="text-sm font-medium text-slate-600 hover:text-indigo-600"
+          className="text-sm font-medium text-muted-foreground hover:text-indigo-600"
         >
           Explore Skills
         </Link>
         <button
           onClick={scrollToStories}
-          className="text-sm font-medium text-slate-600 hover:text-indigo-600"
+          className="text-sm font-medium text-muted-foreground hover:text-indigo-600"
         >
           Stories
         </button>
       </div>
 
-      <div className="hidden md:flex items-center gap-4">
-        <Button variant="ghost" onClick={() => navigateTo("login")}>
+      <div className="hidden md:flex items-center gap-6">
+        <ThemeToggle className="mr-2" />
+        <Button variant="ghost" className="text-foreground" onClick={() => navigateTo("login")}>
           Log in
         </Button>
         <Button onClick={() => navigateTo("login")}>Get Started</Button>
@@ -78,7 +77,7 @@ const Navbar = ({
 
       {/* Mobile Menu Toggle */}
       <button
-        className="md:hidden text-slate-900"
+        className="md:hidden text-foreground"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
       >
         {mobileMenuOpen ? <X /> : <Menu />}
@@ -110,6 +109,11 @@ const Navbar = ({
           Stories
         </button>
         <div className="h-px bg-slate-100 my-2" />
+        <div className="flex items-center gap-4 px-2">
+          <span className="text-sm font-medium text-slate-600">Theme</span>
+          <ThemeToggle />
+        </div>
+        <div className="h-px bg-slate-100 my-2" />
         <Button
           variant="ghost"
           className="justify-start"
@@ -130,11 +134,8 @@ const Footer = () => (
     <div className="container mx-auto px-4 md:px-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <div className="col-span-1 md:col-span-2">
-          <div className="flex items-center gap-2 font-bold text-xl text-white mb-4">
-            <div className="bg-indigo-600 p-1.5 rounded-lg text-white">
-              <RefreshCw size={20} />
-            </div>
-            <span>SkillSwap</span>
+          <div className="mb-4">
+            <BrandLogo />
           </div>
           <p className="text-slate-400 max-w-sm">
             The marketplace where your knowledge is the currency. Teach what you
@@ -187,7 +188,7 @@ const LandingView = ({
   scrollToStories,
   storiesRef,
 }: any) => (
-  <div className="min-h-screen bg-white">
+  <div className="min-h-screen bg-background">
     <Navbar
       isScrolled={isScrolled}
       mobileMenuOpen={mobileMenuOpen}
@@ -209,14 +210,14 @@ const LandingView = ({
         >
           Now live in 50+ countries 🌍
         </Badge>
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-slate-900 mb-6">
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-6">
           Swap Skills.
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
             Not Bills.
           </span>
         </h1>
-        <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
           Exchange your expertise for the knowledge you crave. Connect with
           people who want to learn what you know, and teach you what you don't.
         </p>
@@ -229,7 +230,7 @@ const LandingView = ({
           </Button>
           <Button
             variant="outline"
-            className="h-12 px-8 text-base w-full sm:w-auto"
+            className="h-12 px-8 text-base w-full sm:w-auto text-foreground"
           >
             View Popular Skills
           </Button>
@@ -251,13 +252,13 @@ const LandingView = ({
     </section>
 
     {/* Value Prop / How it works */}
-    <section className="py-24 bg-slate-50/50 border-y border-slate-200">
+    <section className="py-24 bg-muted/50 border-y border-border">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl font-bold text-foreground mb-4">
             How SkillSwap Works
           </h2>
-          <p className="text-slate-600 max-w-xl mx-auto">
+          <p className="text-muted-foreground max-w-xl mx-auto">
             Our AI matching algorithm connects you with the perfect learning
             partner based on your skills and interests.
           </p>
@@ -283,14 +284,14 @@ const LandingView = ({
           ].map((feature, i) => (
             <Card
               key={i}
-              className="border-none shadow-lg bg-white relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300"
+              className="border-none shadow-lg bg-card relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300"
             >
               <CardHeader>
                 <div className="mb-4 p-3 bg-indigo-50 rounded-xl w-fit group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
                   {feature.icon}
                 </div>
                 <CardTitle className="text-xl mb-2">{feature.title}</CardTitle>
-                <p className="text-slate-500 leading-relaxed">{feature.desc}</p>
+                <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
               </CardHeader>
             </Card>
           ))}
@@ -300,17 +301,17 @@ const LandingView = ({
 
 
     {/* Stories Section */}
-    <section ref={storiesRef} className="py-24 bg-white relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-full bg-slate-50 opacity-50 -z-10"></div>
+    <section ref={storiesRef} className="py-24 bg-background relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-full bg-muted/50 opacity-50 -z-10"></div>
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
           <Badge variant="outline" className="mb-4 text-indigo-700 bg-indigo-50 border-indigo-200">
             Community Stories
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             See what happens when skills swap
           </h2>
-          <p className="text-slate-600 max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             Real people, real connections, and real growth. Join thousands of others who are leveling up their lives.
           </p>
         </div>
@@ -336,18 +337,18 @@ const LandingView = ({
               skillSwapped: "English ⇄ Japanese"
             }
           ].map((story, i) => (
-            <Card key={i} className="bg-white border-slate-100 shadow-md hover:shadow-xl transition-all duration-300">
+            <Card key={i} className="bg-card border-border shadow-md hover:shadow-xl transition-all duration-300">
               <CardHeader>
                 <div className="flex gap-1 mb-4">
                   {[1, 2, 3, 4, 5].map(star => <Star key={star} size={16} className="fill-yellow-400 text-yellow-400" />)}
                 </div>
-                <p className="text-slate-700 italic mb-6 leading-relaxed">"{story.quote}"</p>
+                <p className="text-muted-foreground italic mb-6 leading-relaxed">"{story.quote}"</p>
               </CardHeader>
               <CardContent className="mt-auto border-t border-slate-50 pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-bold text-slate-900">{story.author}</h4>
-                    <p className="text-xs text-slate-500">{story.role}</p>
+                    <h4 className="font-bold text-foreground">{story.author}</h4>
+                    <p className="text-xs text-muted-foreground">{story.role}</p>
                   </div>
                   <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 font-normal">
                     {story.skillSwapped}
@@ -365,14 +366,14 @@ const LandingView = ({
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex justify-between items-end mb-12">
           <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">
+            <h2 className="text-3xl font-bold text-foreground mb-2">
               Trending Skills
             </h2>
-            <p className="text-slate-600">
+            <p className="text-muted-foreground">
               What the community is swapping this week.
             </p>
           </div>
-          <Button variant="ghost" className="hidden md:flex gap-2">
+          <Button variant="ghost" className="hidden md:flex gap-2 text-muted-foreground hover:text-foreground">
             View all <ArrowRight size={16} />
           </Button>
         </div>
@@ -422,7 +423,7 @@ const LandingView = ({
           ].map((cat, i) => (
             <div
               key={i}
-              className="p-4 border border-slate-200 rounded-xl hover:border-indigo-600 hover:shadow-md cursor-pointer transition-all flex flex-col gap-3 group"
+              className="p-4 border border-border rounded-xl hover:border-indigo-600 hover:shadow-md cursor-pointer transition-all flex flex-col gap-3 group"
             >
               <div className="flex justify-between items-start">
                 {cat.icon}
@@ -432,8 +433,8 @@ const LandingView = ({
                 />
               </div>
               <div>
-                <h4 className="font-semibold text-slate-900">{cat.name}</h4>
-                <p className="text-xs text-slate-500">{cat.count}</p>
+                <h4 className="font-semibold text-foreground">{cat.name}</h4>
+                <p className="text-xs text-muted-foreground">{cat.count}</p>
               </div>
             </div>
           ))}
@@ -480,7 +481,7 @@ const LoginView = ({
   handleSignUp,
   navigateTo,
 }: any) => (
-  <div className="min-h-screen grid md:grid-cols-2 bg-white">
+  <div className="min-h-screen grid md:grid-cols-2 bg-background">
     <div className="relative hidden md:block bg-slate-900">
       <div className="absolute inset-0 bg-indigo-600/20 mix-blend-multiply"></div>
       <img
@@ -500,18 +501,18 @@ const LoginView = ({
     <div className="flex items-center justify-center p-8">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <div className="inline-flex bg-indigo-600 p-2 rounded-xl text-white mb-4">
-            <RefreshCw size={24} />
+          <div className="mb-4">
+            <BrandLogo />
           </div>
-          <h2 className="text-3xl font-bold text-slate-900">Welcome back</h2>
-          <p className="text-slate-600 mt-2">
+          <h2 className="text-3xl font-bold text-foreground">Welcome back</h2>
+          <p className="text-muted-foreground mt-2">
             Enter your details to access your account.
           </p>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-900">Email</label>
+            <label className="text-sm font-medium text-foreground">Email</label>
             <Input
               type="email"
               placeholder="name@example.com"
@@ -520,7 +521,7 @@ const LoginView = ({
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-900">
+            <label className="text-sm font-medium text-foreground">
               Password
             </label>
             <Input
@@ -540,10 +541,10 @@ const LoginView = ({
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-slate-200" />
+              <span className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-500">Or</span>
+              <span className="bg-background px-2 text-muted-foreground">Or</span>
             </div>
           </div>
 
@@ -559,7 +560,7 @@ const LoginView = ({
 
         <div className="text-center text-sm">
           <button
-            className="text-slate-500 hover:text-indigo-600"
+            className="text-muted-foreground hover:text-indigo-600"
             onClick={() => navigateTo("landing")}
           >
             ← Back to Home

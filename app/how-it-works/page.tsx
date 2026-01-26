@@ -36,12 +36,12 @@ export default function HowItWorks() {
             <Navbar />
             <main className="flex-1">
                 {/* Hero Section */}
-                <section className="py-20 bg-slate-50">
+                <section className="py-20 bg-muted/50">
                     <div className="container px-4 mx-auto text-center max-w-4xl">
-                        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-6">
+                        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground mb-6">
                             How <span className="text-indigo-600">SkillSwap</span> Works
                         </h1>
-                        <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
+                        <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
                             SkillSwap is a community-driven platform where you can trade your expertise for new skills. No money changes hands—just knowledge.
                         </p>
                         <div className="flex gap-4 justify-center">
@@ -59,12 +59,12 @@ export default function HowItWorks() {
                     <div className="container px-4 mx-auto max-w-6xl">
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {steps.map((step, index) => (
-                                <div key={index} className="flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                                <div key={index} className="flex flex-col items-center text-center p-6 bg-card rounded-2xl shadow-sm border border-border hover:shadow-md transition-shadow">
                                     <div className="mb-6 p-4 bg-indigo-50 rounded-full">
                                         {step.icon}
                                     </div>
-                                    <h3 className="text-xl font-bold text-slate-900 mb-3">{step.title}</h3>
-                                    <p className="text-slate-600 leading-relaxed">{step.description}</p>
+                                    <h3 className="text-xl font-bold text-foreground mb-3">{step.title}</h3>
+                                    <p className="text-muted-foreground leading-relaxed">{step.description}</p>
                                 </div>
                             ))}
                         </div>
@@ -72,9 +72,9 @@ export default function HowItWorks() {
                 </section>
 
                 {/* FAQ Section (Optional/Simple) */}
-                <section className="py-20 bg-slate-50">
+                <section className="py-20 bg-muted/50">
                     <div className="container px-4 mx-auto max-w-3xl text-center">
-                        <h2 className="text-3xl font-bold text-slate-900 mb-8">Ready to start learning?</h2>
+                        <h2 className="text-3xl font-bold text-foreground mb-8">Ready to start learning?</h2>
                         <Link href="/">
                             <Button size="lg" variant="default">Join the Community</Button>
                         </Link>

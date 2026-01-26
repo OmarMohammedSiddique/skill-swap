@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { BrandLogo } from "@/components/brand-logo";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function Navbar() {
@@ -9,17 +11,17 @@ export default async function Navbar() {
   } = await supabase.auth.getUser();
 
   return (
-    <nav className="border-b bg-white">
+    <nav className="border-b bg-background">
       <div className="flex h-16 items-center px-4 max-w-5xl mx-auto container justify-between">
         {/* Logo / Brand */}
         <div className="flex items-center gap-8">
           <Link
             href={user ? "/dashboard" : "/"}
-            className="font-bold text-xl tracking-tight"
+            className="hover:opacity-80 transition-opacity"
           >
-            SkillSwap <span className="text-blue-600">v2</span>
+            <BrandLogo />
           </Link>
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
             <Link href="/how-it-works" className="hover:text-indigo-600">
               How it Works
             </Link>
@@ -30,18 +32,19 @@ export default async function Navbar() {
         </div>
 
         {/* Right Side Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
+          <ThemeToggle className="mr-2" />
           {user ? (
             <>
               <Link
                 href="/dashboard"
-                className="text-sm font-medium hover:underline text-slate-600"
+                className="text-sm font-medium hover:underline text-muted-foreground"
               >
                 Dashboard
               </Link>
               <Link
                 href="/setup"
-                className="text-sm font-medium hover:underline text-slate-600"
+                className="text-sm font-medium hover:underline text-muted-foreground"
               >
                 My Profile
               </Link>

@@ -123,3 +123,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Ensure sr-only is available if Tailwind doesn't provide it automatically in this setup */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
