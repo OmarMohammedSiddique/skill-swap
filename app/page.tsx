@@ -373,9 +373,11 @@ const LandingView = ({
               What the community is swapping this week.
             </p>
           </div>
-          <Button variant="ghost" className="hidden md:flex gap-2 text-muted-foreground hover:text-foreground">
-            View all <ArrowRight size={16} />
-          </Button>
+          <Link href="/explore">
+            <Button variant="ghost" className="hidden md:flex gap-2 text-muted-foreground hover:text-foreground">
+              View all <ArrowRight size={16} />
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
