@@ -24,6 +24,7 @@ import {
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { BrandLogo } from "@/components/brand-logo";
+import { Footer } from "@/components/footer";
 
 // --- COMPONENTS MOVED OUTSIDE ---
 
@@ -129,56 +130,7 @@ const Navbar = ({
   </nav>
 );
 
-const Footer = () => (
-  <footer className="bg-slate-950 text-slate-300 py-12 border-t border-slate-800">
-    <div className="container mx-auto px-4 md:px-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-        <div className="col-span-1 md:col-span-2">
-          <div className="mb-4">
-            <BrandLogo />
-          </div>
-          <p className="text-slate-400 max-w-sm">
-            The marketplace where your knowledge is the currency. Teach what you
-            love, learn what you need, and connect with a global community of
-            makers and doers.
-          </p>
-        </div>
-        <div>
-          <h4 className="font-semibold text-white mb-4">Platform</h4>
-          <ul className="space-y-2 text-sm">
-            <li className="hover:text-indigo-400 cursor-pointer">
-              Browse Skills
-            </li>
-            <li className="hover:text-indigo-400 cursor-pointer">
-              How it Matches
-            </li>
-            <li className="hover:text-indigo-400 cursor-pointer">
-              Pricing (Free!)
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h4 className="font-semibold text-white mb-4">Legal</h4>
-          <ul className="space-y-2 text-sm">
-            <li className="hover:text-indigo-400 cursor-pointer">
-              Privacy Policy
-            </li>
-            <li className="hover:text-indigo-400 cursor-pointer">
-              Terms of Service
-            </li>
-            <li className="hover:text-indigo-400 cursor-pointer">
-              Safety Guidelines
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
-        <p>&copy; 2024 SkillSwap Inc. All rights reserved.</p>
-        <p>Built with Next.js & Supabase</p>
-      </div>
-    </div>
-  </footer>
-);
+
 
 const LandingView = ({
   isScrolled,

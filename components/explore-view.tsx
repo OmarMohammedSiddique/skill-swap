@@ -56,7 +56,13 @@ export default function ExploreView() {
 
                     <div className="flex flex-wrap justify-center gap-2 mt-6">
                         {categories.map((cat) => (
-                            <Button key={cat.name} variant="outline" size="sm" className="gap-2 rounded-full text-foreground hover:bg-muted">
+                            <Button
+                                key={cat.name}
+                                variant={searchQuery === cat.name ? "default" : "outline"}
+                                size="sm"
+                                className={`gap-2 rounded-full ${searchQuery === cat.name ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"}`}
+                                onClick={() => setSearchQuery(cat.name)}
+                            >
                                 {cat.icon}
                                 {cat.name}
                             </Button>
