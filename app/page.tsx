@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,8 @@ const Navbar = ({
   mobileMenuOpen,
   setMobileMenuOpen,
   navigateTo,
+  storiesRef,
+  scrollToStories,
 }: any) => (
   <nav
     className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-white/80 backdrop-blur-md border-b border-slate-200 py-3" : "bg-transparent py-5"}`}
@@ -60,7 +62,7 @@ const Navbar = ({
           Explore Skills
         </Link>
         <button
-          onClick={() => navigateTo("landing")}
+          onClick={scrollToStories}
           className="text-sm font-medium text-slate-600 hover:text-indigo-600"
         >
           Stories
@@ -99,7 +101,10 @@ const Navbar = ({
           Explore Skills
         </Link>
         <button
-          onClick={() => navigateTo("landing")}
+          onClick={() => {
+            setMobileMenuOpen(false);
+            scrollToStories();
+          }}
           className="text-left text-sm font-medium text-slate-600 py-2"
         >
           Stories
@@ -179,6 +184,8 @@ const LandingView = ({
   mobileMenuOpen,
   setMobileMenuOpen,
   navigateTo,
+  scrollToStories,
+  storiesRef,
 }: any) => (
   <div className="min-h-screen bg-white">
     <Navbar
@@ -186,6 +193,7 @@ const LandingView = ({
       mobileMenuOpen={mobileMenuOpen}
       setMobileMenuOpen={setMobileMenuOpen}
       navigateTo={navigateTo}
+      scrollToStories={scrollToStories}
     />
 
     {/* Hero Section */}
@@ -284,6 +292,68 @@ const LandingView = ({
                 <CardTitle className="text-xl mb-2">{feature.title}</CardTitle>
                 <p className="text-slate-500 leading-relaxed">{feature.desc}</p>
               </CardHeader>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+
+
+    {/* Stories Section */}
+    <section ref={storiesRef} className="py-24 bg-white relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-full bg-slate-50 opacity-50 -z-10"></div>
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="text-center mb-16">
+          <Badge variant="outline" className="mb-4 text-indigo-700 bg-indigo-50 border-indigo-200">
+            Community Stories
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+            See what happens when skills swap
+          </h2>
+          <p className="text-slate-600 max-w-2xl mx-auto">
+            Real people, real connections, and real growth. Join thousands of others who are leveling up their lives.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            {
+              quote: "I needed a website for my bakery, but couldn't afford a dev. I swapped my baking skills for a React site. Now I have a site AND a new friend who loves sourdough!",
+              author: "Elena R.",
+              role: "Baker & Entrepreneur",
+              skillSwapped: "Baking ⇄ Web Dev"
+            },
+            {
+              quote: "I always wanted to learn guitar. I found a music student who needed help with Statistics. We met weekly, and now I can play Wonderwall (and he passed his exam!).",
+              author: "Marcus T.",
+              role: "Data Analyst",
+              skillSwapped: "Stats ⇄ Guitar"
+            },
+            {
+              quote: "Language exchange apps felt impersonal. Here, I met a native Japanese speaker who wanted to improve her English presentation skills. The cultural exchange was invaluable.",
+              author: "Sarah J.",
+              role: "Marketing Director",
+              skillSwapped: "English ⇄ Japanese"
+            }
+          ].map((story, i) => (
+            <Card key={i} className="bg-white border-slate-100 shadow-md hover:shadow-xl transition-all duration-300">
+              <CardHeader>
+                <div className="flex gap-1 mb-4">
+                  {[1, 2, 3, 4, 5].map(star => <Star key={star} size={16} className="fill-yellow-400 text-yellow-400" />)}
+                </div>
+                <p className="text-slate-700 italic mb-6 leading-relaxed">"{story.quote}"</p>
+              </CardHeader>
+              <CardContent className="mt-auto border-t border-slate-50 pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-slate-900">{story.author}</h4>
+                    <p className="text-xs text-slate-500">{story.role}</p>
+                  </div>
+                  <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 font-normal">
+                    {story.skillSwapped}
+                  </Badge>
+                </div>
+              </CardContent>
             </Card>
           ))}
         </div>
@@ -524,6 +594,20 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Scroll reference for Stories section
+  const storiesRef = useRef<HTMLDivElement>(null);
+
+  const scrollToStories = () => {
+    if (currentView !== "landing") {
+      setCurrentView("landing");
+      setTimeout(() => {
+        storiesRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else {
+      storiesRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   const navigateTo = (view: "landing" | "login") => {
     window.scrollTo(0, 0);
     setCurrentView(view);
@@ -566,6 +650,8 @@ export default function Home() {
           mobileMenuOpen={mobileMenuOpen}
           setMobileMenuOpen={setMobileMenuOpen}
           navigateTo={navigateTo}
+          storiesRef={storiesRef}
+          scrollToStories={scrollToStories}
         />
       )}
       {currentView === "login" && (
