@@ -1,3 +1,4 @@
+import Navbar from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,7 @@ export default function ExplorePage() {
 
     return (
         <div className="flex flex-col min-h-screen bg-slate-50">
+            <Navbar />
             {/* Header */}
             <div className="bg-white border-b">
                 <div className="container mx-auto px-4 py-12 text-center max-w-4xl">
