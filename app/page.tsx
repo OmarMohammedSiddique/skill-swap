@@ -180,12 +180,14 @@ const LandingView = ({
           >
             Start Swapping Now
           </Button>
-          <Button
-            variant="outline"
-            className="h-12 px-8 text-base w-full sm:w-auto text-foreground"
-          >
-            View Popular Skills
-          </Button>
+          <Link href="/explore">
+            <Button
+              variant="outline"
+              className="h-12 px-8 text-base w-full sm:w-auto text-foreground"
+            >
+              View Popular Skills
+            </Button>
+          </Link>
         </div>
 
         <div className="mt-16 flex items-center justify-center gap-8 text-slate-400 grayscale opacity-70">
