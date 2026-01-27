@@ -35,11 +35,29 @@ export default async function Dashboard() {
     .ilike("skill_name", iWantToLearn)
     .neq("user_id", user.id);
 
+  // Fetch Outgoing Requests (Match with potentialTeachers)
+  const { data: outgoingRequests } = await supabase
+    .from("swap_requests")
+    .select("*")
+    .eq("requester_id", user.id);
+
+  // Fetch Incoming Requests
+  const { data: incomingRequests } = await supabase
+    .from("swap_requests")
+    .select(`
+      *,
+      profiles!requester_id ( full_name, email )
+    `)
+    .eq("receiver_id", user.id)
+    .eq("status", "pending");
+
   return (
     <DashboardClient
       user={user}
       mySkills={mySkills || []}
       potentialTeachers={potentialTeachers || []}
+      outgoingRequests={outgoingRequests || []}
+      incomingRequests={incomingRequests || []}
     />
   );
 }

@@ -5,17 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Search } from "lucide-react";
+import SwapRequestButton from "@/components/swap-request-button";
+import SwapRequestsList from "@/components/swap-requests-list";
 
 interface DashboardClientProps {
   user: any;
   mySkills: any[];
   potentialTeachers: any[];
+  outgoingRequests: any[];
+  incomingRequests: any[];
 }
 
 export default function DashboardClient({
   user,
   mySkills,
   potentialTeachers,
+  outgoingRequests,
+  incomingRequests,
 }: DashboardClientProps) {
   const router = useRouter();
 
@@ -118,93 +124,96 @@ export default function DashboardClient({
           </aside>
 
           {/* Main Feed */}
-          <main className="flex-1">
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-900">
-                Recommended Matches
-              </h1>
-              <p className="text-slate-600">
-                Based on your desire to learn{" "}
-                <span className="font-semibold text-indigo-600">
-                  {iWantToLearn}
-                </span>
-                .
-              </p>
-            </div>
+          <main className="flex-1 space-y-8">
 
-            <div className="space-y-4">
-              {potentialTeachers?.map((match: any) => (
-                <Card
-                  key={match.user_id}
-                  className="flex flex-col md:flex-row items-center p-6 gap-6 hover:border-indigo-300 transition-colors"
-                >
-                  <div className="relative">
-                    <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-xl font-bold text-slate-500">
-                      {match.profiles?.full_name?.charAt(0) || "?"}
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white"></div>
-                  </div>
+            {/* INCOMING REQUESTS CHECK */}
+            {incomingRequests && incomingRequests.length > 0 && (
+              <SwapRequestsList requests={incomingRequests} />
+            )}
 
-                  <div className="flex-1 text-center md:text-left">
-                    <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
-                      <h3 className="font-bold text-lg text-slate-900">
-                        {match.profiles?.full_name || "Anonymous"}
-                      </h3>
-                      <Badge
-                        variant="outline"
-                        className="text-green-600 bg-green-50 border-green-200"
-                      >
-                        95% Match
-                      </Badge>
-                    </div>
+            <div>
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold text-slate-900">
+                  Recommended Matches
+                </h1>
+                <p className="text-slate-600">
+                  Based on your desire to learn{" "}
+                  <span className="font-semibold text-indigo-600">
+                    {iWantToLearn}
+                  </span>
+                  .
+                </p>
+              </div>
 
-                    <div className="flex flex-col md:flex-row gap-2 md:gap-6 text-sm">
-                      <div className="flex items-center gap-1 justify-center md:justify-start text-slate-600">
-                        <span className="font-medium text-slate-400 uppercase text-xs">
-                          Offers:
-                        </span>
-                        <span className="font-semibold text-slate-800">
-                          {match.skill_name}
-                        </span>
+              <div className="space-y-4">
+                {potentialTeachers?.map((match: any) => {
+                  const existingRequest = outgoingRequests?.find(
+                    (req) => req.receiver_id === match.user_id
+                  );
+                  return (
+                    <Card
+                      key={match.user_id}
+                      className="flex flex-col md:flex-row items-center p-6 gap-6 hover:border-indigo-300 transition-colors"
+                    >
+                      <div className="relative">
+                        <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-xl font-bold text-slate-500">
+                          {match.profiles?.full_name?.charAt(0) || "?"}
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white"></div>
                       </div>
-                      <div className="flex items-center gap-1 justify-center md:justify-start text-slate-600">
-                        <span className="font-medium text-slate-400 uppercase text-xs">
-                          Wants:
-                        </span>
-                        <span className="font-semibold text-slate-800">
-                          {iCanTeach}
-                        </span>
+
+                      <div className="flex-1 text-center md:text-left">
+                        <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
+                          <h3 className="font-bold text-lg text-slate-900">
+                            {match.profiles?.full_name || "Anonymous"}
+                          </h3>
+                          <Badge
+                            variant="outline"
+                            className="text-green-600 bg-green-50 border-green-200"
+                          >
+                            95% Match
+                          </Badge>
+                        </div>
+
+                        <div className="flex flex-col md:flex-row gap-2 md:gap-6 text-sm">
+                          <div className="flex items-center gap-1 justify-center md:justify-start text-slate-600">
+                            <span className="font-medium text-slate-400 uppercase text-xs">
+                              Offers:
+                            </span>
+                            <span className="font-semibold text-slate-800">
+                              {match.skill_name}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 justify-center md:justify-start text-slate-600">
+                            <span className="font-medium text-slate-400 uppercase text-xs">
+                              Wants:
+                            </span>
+                            <span className="font-semibold text-slate-800">
+                              {iCanTeach}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
 
-                  <div className="flex gap-2 w-full md:w-auto">
-                    <Button variant="outline" className="flex-1">
-                      Profile
-                    </Button>
-                    {match.profiles?.whatsapp_contact && (
-                      <a
-                        href={`https://wa.me/${match.profiles.whatsapp_contact.replace(/[^0-9]/g, "")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1"
-                      >
-                        <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
-                          Request Swap
-                        </Button>
-                      </a>
-                    )}
-                  </div>
-                </Card>
-              ))}
+                      <div className="flex gap-2 w-full md:w-auto min-w-[200px]">
+                        <SwapRequestButton
+                          teacherId={match.user_id}
+                          initialStatus={existingRequest?.status}
+                          teacherContact={match.profiles?.whatsapp_contact}
+                        />
+                      </div>
+                    </Card>
+                  );
+                })}
 
-              {(!potentialTeachers || potentialTeachers.length === 0) && (
-                <div className="p-12 text-center border-2 border-dashed rounded-lg bg-white/50">
-                  <p className="text-muted-foreground">
-                    No one is teaching <strong>{iWantToLearn}</strong> yet.
-                  </p>
-                </div>
-              )}
+                {(!potentialTeachers || potentialTeachers.length === 0) && (
+                  <div className="p-12 text-center border-2 border-dashed rounded-lg bg-white/50">
+                    <p className="text-muted-foreground">
+                      No one is teaching <strong>{iWantToLearn}</strong> yet.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="mt-8 p-6 bg-indigo-900 rounded-xl text-white flex justify-between items-center">
