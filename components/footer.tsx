@@ -26,8 +26,10 @@ export function Footer() {
                                     Browse Skills
                                 </Link>
                             </li>
-                            <li className="hover:text-primary cursor-pointer">
-                                How it Matches
+                            <li>
+                                <Link href="/how-it-matches" className="hover:text-primary cursor-pointer">
+                                    How it Matches
+                                </Link>
                             </li>
                             <li className="hover:text-primary cursor-pointer">
                                 Pricing (Free!)
@@ -56,7 +58,7 @@ export function Footer() {
                     </div>
                 </div>
                 <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
-                    <p>&copy; 2024 SkillSwap Inc. All rights reserved.</p>
+                    <p>&copy; 2026 SkillSwap Inc. All rights reserved.</p>
                     <p>Built with Next.js & Supabase</p>
                 </div>
             </div>
