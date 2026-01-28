@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Code, Palette, Languages, Music, Briefcase, Camera } from "lucide-react";
+import { Search, Code, Palette, Languages, Music, Briefcase, Camera, X } from "lucide-react";
 
 export default function ExploreView() {
     const categories = [
@@ -45,13 +45,21 @@ export default function ExploreView() {
                     </p>
 
                     <div className="relative max-w-xl mx-auto">
-                        <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
                             placeholder="Search for skills (e.g. Python, Piano, Cooking)..."
-                            className="pl-10 h-12 text-lg shadow-sm"
+                            className="pl-10 pr-10 h-12 text-lg shadow-sm"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery("")}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        )}
                     </div>
 
                     <div className="flex flex-wrap justify-center gap-2 mt-6">
