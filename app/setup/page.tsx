@@ -9,10 +9,14 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { X, Plus } from "lucide-react"
+import { countryCodes } from '@/utils/country-codes'
 
 export default function SetupProfile() {
   const [fullName, setFullName] = useState('')
-  const [contact, setContact] = useState('')
+  
+  // Contact State
+  const [countryCode, setCountryCode] = useState('+254') // Default to something or empty
+  const [phoneNumber, setPhoneNumber] = useState('')
 
   // State for skills lists
   const [teachSkills, setTeachSkills] = useState<string[]>([])
@@ -29,16 +33,39 @@ export default function SetupProfile() {
 
   // Helper to add skill
   const addSkill = (type: 'TEACH' | 'LEARN') => {
+    const normalize = (s: string) => s.trim().toLowerCase();
+
     if (type === 'TEACH') {
-      if (currentTeachInput.trim() && !teachSkills.includes(currentTeachInput.trim())) {
-        setTeachSkills([...teachSkills, currentTeachInput.trim()])
-        setCurrentTeachInput('')
+      const skillName = currentTeachInput.trim();
+      if (!skillName) return;
+
+      // Check if already in Teach list
+      if (teachSkills.includes(skillName)) return;
+
+      // Check if in Learn list (Cross-validation)
+      if (learnSkills.some(s => normalize(s) === normalize(skillName))) {
+        alert(`You can't teach what you want to learn! "${skillName}" is already in your Learn list.`);
+        return;
       }
+
+      setTeachSkills([...teachSkills, skillName])
+      setCurrentTeachInput('')
+      
     } else {
-      if (currentLearnInput.trim() && !learnSkills.includes(currentLearnInput.trim())) {
-        setLearnSkills([...learnSkills, currentLearnInput.trim()])
-        setCurrentLearnInput('')
+      const skillName = currentLearnInput.trim();
+      if (!skillName) return;
+
+      // Check if already in Learn list
+      if (learnSkills.includes(skillName)) return;
+
+      // Check if in Teach list (Cross-validation)
+      if (teachSkills.some(s => normalize(s) === normalize(skillName))) {
+        alert(`You can't learn what you can teach! "${skillName}" is already in your Teach list.`);
+        return;
       }
+
+      setLearnSkills([...learnSkills, skillName])
+      setCurrentLearnInput('')
     }
   }
 
@@ -60,6 +87,24 @@ export default function SetupProfile() {
   }
 
   const handleSubmit = async () => {
+    // 1. Validation
+    if (!fullName.trim()) {
+      alert("Please enter your full name.");
+      return;
+    }
+
+    if (!phoneNumber.trim()) {
+      alert("Please enter your phone number.");
+      return;
+    }
+
+    // Basic number validation (digits only, at least 7 digits)
+    const cleanedNumber = phoneNumber.replace(/\D/g, '');
+    if (cleanedNumber.length < 7) {
+       alert("Please enter a valid phone number.");
+       return;
+    }
+
     if (teachSkills.length === 0 || learnSkills.length === 0) {
       alert("Please add at least one skill to teach and one to learn.")
       return;
@@ -67,16 +112,18 @@ export default function SetupProfile() {
 
     setLoading(true)
 
+    const fullContact = `${countryCode} ${cleanedNumber}`; // Format: +254 712345678
+
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    // 1. Update Profile (Name & Contact)
+    // 2. Update Profile
     const { error: profileError } = await supabase
       .from('profiles')
       .upsert({
         id: user.id,
         full_name: fullName,
-        whatsapp_contact: contact,
+        whatsapp_contact: fullContact,
         email: user.email
       })
 
@@ -86,7 +133,7 @@ export default function SetupProfile() {
       return
     }
 
-    // 2. Add Skills
+    // 3. Add Skills
     const teachInserts = teachSkills.map(skill => ({
       user_id: user.id,
       skill_name: skill,
@@ -130,7 +177,29 @@ export default function SetupProfile() {
 
             <div className="space-y-2">
               <Label>WhatsApp / Contact Info</Label>
-              <Input placeholder="+254 7..." value={contact} onChange={e => setContact(e.target.value)} />
+              <div className="flex gap-2">
+                 <select 
+                    className="flex h-10 w-[110px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={countryCode}
+                    onChange={(e) => setCountryCode(e.target.value)}
+                 >
+                    {countryCodes.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.flag} {c.code}
+                      </option>
+                    ))}
+                 </select>
+                 <Input 
+                    type="tel"
+                    placeholder="712 345 678" 
+                    value={phoneNumber} 
+                    onChange={e => setPhoneNumber(e.target.value)} 
+                    className="flex-1"
+                 />
+              </div>
+              <p className="text-[0.8rem] text-muted-foreground">
+                We'll use this to maintain safety.
+              </p>
             </div>
           </div>
 

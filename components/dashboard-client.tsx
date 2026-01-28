@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Search } from "lucide-react";
+import { RefreshCw, Search, ArrowRight, Repeat } from "lucide-react";
 import SwapRequestButton from "@/components/swap-request-button";
 import SwapRequestsList from "@/components/swap-requests-list";
 
@@ -12,6 +12,8 @@ interface DashboardClientProps {
   user: any;
   mySkills: any[];
   potentialTeachers: any[];
+  directMatches: any[];
+  circularMatches: any[];
   outgoingRequests: any[];
   incomingRequests: any[];
 }
@@ -20,6 +22,8 @@ export default function DashboardClient({
   user,
   mySkills,
   potentialTeachers,
+  directMatches,
+  circularMatches,
   outgoingRequests,
   incomingRequests,
 }: DashboardClientProps) {
@@ -131,67 +135,173 @@ export default function DashboardClient({
               <SwapRequestsList requests={incomingRequests} />
             )}
 
+            {/* SECTION 1: PERFECT DIRECT MATCHES */}
             <div>
-              <div className="mb-6">
-                <h1 className="text-2xl font-bold text-slate-900">
-                  Recommended Matches
+              <div className="mb-4 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-slate-900">
+                  Perfect Matches
+                </h2>
+                <Badge className="bg-amber-500 hover:bg-amber-600">
+                  Direct Swap
+                </Badge>
+              </div>
+              
+              <div className="grid gap-4">
+                {directMatches.map((match) => {
+                   const existingRequest = outgoingRequests?.find(
+                    (req) => req.receiver_id === match.user_id
+                  );
+                  return (
+                    <Card key={match.user_id} className="p-6 border-amber-200 bg-amber-50/50">
+                       <div className="flex flex-col md:flex-row items-center gap-6">
+                          <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-xl font-bold text-amber-600 border-2 border-amber-200">
+                              {match.profiles?.full_name?.charAt(0)}
+                          </div>
+                          <div className="flex-1 text-center md:text-left">
+                              <h3 className="font-bold text-lg">{match.profiles?.full_name}</h3>
+                              <p className="text-sm text-slate-600">
+                                You both want what the other has!
+                              </p>
+                              <div className="flex items-center gap-2 mt-2 justify-center md:justify-start">
+                                  <Badge variant="outline" className="bg-white">
+                                    Offers: {match.skill_name}
+                                  </Badge>
+                                  <RefreshCw size={14} className="text-amber-500" />
+                                  <Badge variant="outline" className="bg-white">
+                                    Wants: {match.their_want}
+                                  </Badge>
+                              </div>
+                          </div>
+                          <SwapRequestButton
+                            teacherId={match.user_id}
+                            initialStatus={existingRequest?.status}
+                            teacherContact={match.profiles?.whatsapp_contact}
+                          />
+                       </div>
+                    </Card>
+                  )
+                })}
+                 {directMatches.length === 0 && (
+                  <div className="p-8 text-center border rounded-lg bg-gray-50 text-gray-500 text-sm">
+                    No direct swaps found yet. Try finding a circular match!
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* SECTION 2: CIRCULAR MATCHES */}
+            <div>
+              <div className="mb-4 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-slate-900">
+                  Community Circles
+                </h2>
+                <Badge variant="secondary" className="bg-indigo-100 text-indigo-700">
+                  Chain Swap
+                </Badge>
+              </div>
+              
+              <div className="grid gap-4">
+                {circularMatches.map((match, idx) => {
+                   const existingRequest = outgoingRequests?.find(
+                    (req) => req.receiver_id === match.user.user_id
+                  );
+                  return (
+                    <Card key={idx} className="p-6 border-indigo-100">
+                       <div className="flex flex-col md:flex-row items-center gap-6">
+                          {/* Chain Visual */}
+                          <div className="flex items-center gap-1 text-slate-400 text-xs font-mono">
+                             <div className="flex flex-col items-center">
+                                <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">You</div>
+                             </div>
+                             <ArrowRight size={12} />
+                             <div className="flex flex-col items-center">
+                                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200">
+                                    {match.user.profiles?.full_name?.charAt(0)}
+                                </div>
+                                <span>{match.user.profiles?.full_name.split(' ')[0]}</span>
+                             </div>
+                             <ArrowRight size={12} />
+                             <div className="flex flex-col items-center">
+                                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border">
+                                    {match.intermediary.profiles?.full_name?.charAt(0)}
+                                </div>
+                                <span>{match.intermediary.profiles?.full_name.split(' ')[0]}</span>
+                             </div>
+                             <ArrowRight size={12} />
+                             <div className="flex flex-col items-center">
+                                <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">You</div>
+                             </div>
+                          </div>
+
+                          <div className="flex-1 text-center md:text-left pl-4 border-l border-slate-100">
+                              <h3 className="font-bold text-lg">
+                                Swap with {match.user.profiles?.full_name}
+                              </h3>
+                              <p className="text-sm text-slate-600">
+                                Part of a 3-way exchange. {match.intermediary.profiles?.full_name} completes the circle.
+                              </p>
+                              <div className="mt-2">
+                                  <Badge variant="outline">
+                                    You learn {match.user.skill_name}
+                                  </Badge>
+                              </div>
+                          </div>
+                          <SwapRequestButton
+                            teacherId={match.user.user_id}
+                            initialStatus={existingRequest?.status}
+                            teacherContact={match.user.profiles?.whatsapp_contact}
+                          />
+                       </div>
+                    </Card>
+                  )
+                })}
+                 {circularMatches.length === 0 && (
+                  <div className="p-8 text-center border rounded-lg bg-gray-50 text-gray-500 text-sm">
+                    No circular matches found.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* SECTION 3: ALL TEACHERS (Direct Directory) */}
+            <div>
+              <div className="mb-6 mt-8 border-t pt-8">
+                <h1 className="text-xl font-bold text-slate-900">
+                  All Teachers for {iWantToLearn}
                 </h1>
-                <p className="text-slate-600">
-                  Based on your desire to learn{" "}
-                  <span className="font-semibold text-indigo-600">
-                    {iWantToLearn}
-                  </span>
-                  .
+                <p className="text-slate-600 text-sm">
+                  These people teach what you want, but might not need what you teach.
                 </p>
               </div>
 
               <div className="space-y-4">
                 {potentialTeachers?.map((match: any) => {
+                   // Avoid showing duplicates if they are already in direct matches
+                   if (directMatches.find(dm => dm.user_id === match.user_id)) return null;
+
                   const existingRequest = outgoingRequests?.find(
                     (req) => req.receiver_id === match.user_id
                   );
                   return (
                     <Card
                       key={match.user_id}
-                      className="flex flex-col md:flex-row items-center p-6 gap-6 hover:border-indigo-300 transition-colors"
+                      className="flex flex-col md:flex-row items-center p-6 gap-6 hover:border-slate-300 transition-colors"
                     >
                       <div className="relative">
-                        <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-xl font-bold text-slate-500">
+                        <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-lg font-bold text-slate-500">
                           {match.profiles?.full_name?.charAt(0) || "?"}
                         </div>
-                        <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white"></div>
                       </div>
 
                       <div className="flex-1 text-center md:text-left">
                         <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
-                          <h3 className="font-bold text-lg text-slate-900">
+                          <h3 className="font-bold text-base text-slate-900">
                             {match.profiles?.full_name || "Anonymous"}
                           </h3>
-                          <Badge
-                            variant="outline"
-                            className="text-green-600 bg-green-50 border-green-200"
-                          >
-                            95% Match
-                          </Badge>
                         </div>
 
-                        <div className="flex flex-col md:flex-row gap-2 md:gap-6 text-sm">
-                          <div className="flex items-center gap-1 justify-center md:justify-start text-slate-600">
-                            <span className="font-medium text-slate-400 uppercase text-xs">
-                              Offers:
-                            </span>
-                            <span className="font-semibold text-slate-800">
-                              {match.skill_name}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1 justify-center md:justify-start text-slate-600">
-                            <span className="font-medium text-slate-400 uppercase text-xs">
-                              Wants:
-                            </span>
-                            <span className="font-semibold text-slate-800">
-                              {iCanTeach}
-                            </span>
-                          </div>
+                        <div className="text-sm text-slate-600">
+                            Teaches: <span className="font-semibold text-slate-900">{match.skill_name}</span>
                         </div>
                       </div>
 
