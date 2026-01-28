@@ -13,6 +13,7 @@ import { countryCodes } from '@/utils/country-codes'
 
 export default function SetupProfile() {
   const [fullName, setFullName] = useState('')
+  const [country, setCountry] = useState('')
   
   // Contact State
   const [countryCode, setCountryCode] = useState('+254') // Default to something or empty
@@ -49,6 +50,7 @@ export default function SetupProfile() {
 
       if (profile) {
         setFullName(profile.full_name || '')
+        setCountry(profile.country || '')
         
         // Parse Contact (+Code Number)
         if (profile.whatsapp_contact) {
@@ -141,6 +143,11 @@ export default function SetupProfile() {
       return;
     }
 
+    if (!country) {
+      alert("Please select your country.");
+      return;
+    }
+
     if (!phoneNumber.trim()) {
       alert("Please enter your phone number.");
       return;
@@ -172,7 +179,8 @@ export default function SetupProfile() {
         id: user.id,
         full_name: fullName,
         whatsapp_contact: fullContact,
-        email: user.email
+        email: user.email,
+        country: country
       })
 
     if (profileError) {
@@ -236,6 +244,22 @@ export default function SetupProfile() {
             </div>
 
             <div className="space-y-2">
+              <Label>Country of Residence</Label>
+              <select 
+                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+              >
+                <option value="" disabled>Select your country</option>
+                {countryCodes.map((c) => (
+                  <option key={c.country} value={c.country}>
+                    {c.flag} {c.country}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
               <Label>WhatsApp / Contact Info</Label>
               <div className="flex gap-2">
                  <select 
@@ -244,7 +268,7 @@ export default function SetupProfile() {
                     onChange={(e) => setCountryCode(e.target.value)}
                  >
                     {countryCodes.map((c) => (
-                      <option key={c.code} value={c.code}>
+                      <option key={c.country} value={c.code}>
                         {c.flag} {c.code}
                       </option>
                     ))}

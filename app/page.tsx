@@ -440,7 +440,7 @@ const LandingView = ({
           </Button>
         </div>
         <p className="mt-6 text-sm text-slate-500">
-          No credit card required. Free forever for individuals.
+          No credit card required. Free for everyone.
         </p>
       </div>
     </section>

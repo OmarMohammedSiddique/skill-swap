@@ -32,7 +32,7 @@ export function Footer() {
                                 </Link>
                             </li>
                             <li className="hover:text-primary cursor-pointer">
-                                Pricing (Free!)
+                                <Link href="/mission">Pricing (Free!)</Link>
                             </li>
                         </ul>
                     </div>
@@ -59,7 +59,7 @@ export function Footer() {
                 </div>
                 <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
                     <p>&copy; 2026 SkillSwap Inc. All rights reserved.</p>
-                    <p>Built with Next.js & Supabase</p>
+
                 </div>
             </div>
         </footer>
