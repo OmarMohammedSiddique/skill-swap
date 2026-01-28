@@ -143,6 +143,10 @@ export default async function Dashboard() {
     .select("*")
     .eq("requester_id", user.id);
 
+  /* 
+   * Fetch ALL Incoming Requests (for My Swaps tab)
+   * We will filter 'pending' ones on the client for notifications
+   */
   const { data: incomingRequests } = await supabase
     .from("swap_requests")
     .select(`
@@ -150,7 +154,7 @@ export default async function Dashboard() {
       profiles!requester_id ( full_name, email )
     `)
     .eq("receiver_id", user.id)
-    .eq("status", "pending");
+    .order('created_at', { ascending: false });
 
   return (
     <DashboardClient

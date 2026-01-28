@@ -28,6 +28,8 @@ import { Footer } from "@/components/footer";
 
 // --- COMPONENTS MOVED OUTSIDE ---
 
+// --- COMPONENTS MOVED OUTSIDE ---
+
 const Navbar = ({
   isScrolled,
   mobileMenuOpen,
@@ -35,6 +37,7 @@ const Navbar = ({
   navigateTo,
   storiesRef,
   scrollToStories,
+  user,
 }: any) => (
   <nav
     className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-background/80 backdrop-blur-md border-b border-border py-3" : "bg-transparent py-5"}`}
@@ -42,6 +45,7 @@ const Navbar = ({
     <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
       <div
         onClick={() => navigateTo("landing")}
+        className="cursor-pointer"
       >
         <BrandLogo />
       </div>
@@ -70,10 +74,18 @@ const Navbar = ({
 
       <div className="hidden md:flex items-center gap-6">
         <ThemeToggle className="mr-2" />
-        <Button variant="ghost" className="text-foreground" onClick={() => navigateTo("login")}>
-          Log in
-        </Button>
-        <Button onClick={() => navigateTo("login")}>Get Started</Button>
+        {user ? (
+          <Link href="/dashboard">
+            <Button>Go to Dashboard</Button>
+          </Link>
+        ) : (
+          <>
+            <Button variant="ghost" className="text-foreground" onClick={() => navigateTo("login")}>
+              Log in
+            </Button>
+            <Button onClick={() => navigateTo("login")}>Get Started</Button>
+          </>
+        )}
       </div>
 
       {/* Mobile Menu Toggle */}
@@ -115,16 +127,24 @@ const Navbar = ({
           <ThemeToggle />
         </div>
         <div className="h-px bg-slate-100 my-2" />
-        <Button
-          variant="ghost"
-          className="justify-start"
-          onClick={() => navigateTo("login")}
-        >
-          Log in
-        </Button>
-        <Button className="justify-start" onClick={() => navigateTo("login")}>
-          Get Started
-        </Button>
+        {user ? (
+          <Link href="/dashboard">
+             <Button className="w-full justify-start">Go to Dashboard</Button>
+          </Link>
+        ) : (
+          <>
+            <Button
+              variant="ghost"
+              className="justify-start"
+              onClick={() => navigateTo("login")}
+            >
+              Log in
+            </Button>
+            <Button className="justify-start" onClick={() => navigateTo("login")}>
+              Get Started
+            </Button>
+          </>
+        )}
       </div>
     )}
   </nav>
@@ -139,6 +159,7 @@ const LandingView = ({
   navigateTo,
   scrollToStories,
   storiesRef,
+  user,
 }: any) => (
   <div className="min-h-screen bg-background">
     <Navbar
@@ -147,6 +168,7 @@ const LandingView = ({
       setMobileMenuOpen={setMobileMenuOpen}
       navigateTo={navigateTo}
       scrollToStories={scrollToStories}
+      user={user}
     />
 
     {/* Hero Section */}
@@ -176,9 +198,9 @@ const LandingView = ({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button
             className="h-12 px-8 text-base w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700"
-            onClick={() => navigateTo("login")}
+            onClick={() => user ? window.location.href = '/dashboard' : navigateTo("login")}
           >
-            Start Swapping Now
+            {user ? "Go to Dashboard" : "Start Swapping Now"}
           </Button>
           <Link href="/explore">
             <Button
@@ -412,9 +434,9 @@ const LandingView = ({
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Button
             className="h-12 px-8 text-base bg-white text-slate-900 hover:bg-indigo-50"
-            onClick={() => navigateTo("login")}
+            onClick={() => user ? window.location.href = "/dashboard" : navigateTo("login")}
           >
-            Create Free Account
+            {user ? "Go to Dashboard" : "Create Free Account"}
           </Button>
         </div>
         <p className="mt-6 text-sm text-slate-500">
@@ -533,6 +555,7 @@ export default function Home() {
   );
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   // Auth State
   const [email, setEmail] = useState("");
@@ -551,6 +574,15 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Check for User
+  useEffect(() => {
+    async function checkUser() {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+    }
+    checkUser();
+  }, [])
+
   // Scroll reference for Stories section
   const storiesRef = useRef<HTMLDivElement>(null);
 
@@ -566,6 +598,12 @@ export default function Home() {
   };
 
   const navigateTo = (view: "landing" | "login") => {
+    // If attempting to go to login but we are already logged in -> Dashboard
+    if (view === 'login' && user) {
+        window.location.href = '/dashboard';
+        return;
+    }
+
     window.scrollTo(0, 0);
     setCurrentView(view);
     setMobileMenuOpen(false);
@@ -609,6 +647,7 @@ export default function Home() {
           navigateTo={navigateTo}
           storiesRef={storiesRef}
           scrollToStories={scrollToStories}
+          user={user}
         />
       )}
       {currentView === "login" && (

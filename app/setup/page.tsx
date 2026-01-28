@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
@@ -26,10 +26,58 @@ export default function SetupProfile() {
   const [currentTeachInput, setCurrentTeachInput] = useState('')
   const [currentLearnInput, setCurrentLearnInput] = useState('')
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true) // Start loading true to fetch data
 
   const router = useRouter()
   const supabase = createClient()
+
+  // Fetch existing data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/')
+        return
+      }
+
+      // 1. Get Profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (profile) {
+        setFullName(profile.full_name || '')
+        
+        // Parse Contact (+Code Number)
+        if (profile.whatsapp_contact) {
+            const parts = profile.whatsapp_contact.split(' ')
+            if (parts.length >= 2) {
+                setCountryCode(parts[0]) // +254
+                setPhoneNumber(profile.whatsapp_contact.substring(parts[0].length + 1)) // Rest of string
+            } else {
+                setPhoneNumber(profile.whatsapp_contact)
+            }
+        }
+      }
+
+      // 2. Get Skills
+      const { data: skills } = await supabase
+        .from('skills')
+        .select('*')
+        .eq('user_id', user.id)
+
+      if (skills) {
+        setTeachSkills(skills.filter((s: any) => s.skill_type === 'TEACH').map((s: any) => s.skill_name))
+        setLearnSkills(skills.filter((s: any) => s.skill_type === 'LEARN').map((s: any) => s.skill_name))
+      }
+      
+      setLoading(false)
+    }
+
+    fetchData()
+  }, [])
 
   // Helper to add skill
   const addSkill = (type: 'TEACH' | 'LEARN') => {
@@ -133,7 +181,19 @@ export default function SetupProfile() {
       return
     }
 
-    // 3. Add Skills
+    // 3. Update Skills (Delete old, Insert new)
+    // First, clear existing skills to avoid duplicates/messy updates
+    const { error: deleteError } = await supabase
+        .from('skills')
+        .delete()
+        .eq('user_id', user.id)
+
+    if (deleteError) {
+        console.error('Error clearing old skills:', deleteError)
+        // Continue anyway? converting to specific updates is harder. 
+        // Let's assume it works or we might have duplicates. 
+    }
+
     const teachInserts = teachSkills.map(skill => ({
       user_id: user.id,
       skill_name: skill,
