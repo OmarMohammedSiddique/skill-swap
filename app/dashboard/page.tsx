@@ -137,6 +137,24 @@ export default async function Dashboard() {
   // Actually, we might want to show unique CHAINS. 
   // But for simple User Interface, let's just pass the list.
 
+   // Deduplicate Direct Matches
+  const uniqueDirectMap = new Map();
+  directMatches.forEach(m => {
+      if (!uniqueDirectMap.has(m.user_id)) {
+          uniqueDirectMap.set(m.user_id, m);
+      }
+  });
+  const uniqueDirectMatches = Array.from(uniqueDirectMap.values());
+
+  // Deduplicate Circular Matches (Key by primary teacher)
+  const uniqueCircularMap = new Map();
+  circularMatches.forEach(m => {
+      if (!uniqueCircularMap.has(m.user.user_id)) {
+          uniqueCircularMap.set(m.user.user_id, m);
+      }
+  });
+  const uniqueCircularMatches = Array.from(uniqueCircularMap.values());
+
    // Deduplicate Potential Teachers (Key Error Fix)
   // Ensure each teacher only appears once, even if they match multiple criteria
   const uniqueTeachersMap = new Map();
@@ -171,8 +189,8 @@ export default async function Dashboard() {
       user={user}
       mySkills={mySkills || []}
       potentialTeachers={uniquePotentialTeachers}
-      directMatches={directMatches}
-      circularMatches={circularMatches}
+      directMatches={uniqueDirectMatches}
+      circularMatches={uniqueCircularMatches}
       outgoingRequests={outgoingRequests || []}
       incomingRequests={incomingRequests || []}
     />

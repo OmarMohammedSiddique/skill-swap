@@ -80,6 +80,14 @@ export default async function AdminLayout({
             <Code size={18} />
             Content Moderation
           </Link>
+
+          <Link
+            href="/admin/moderation"
+            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
+            <ShieldAlert size={18} />
+            User Moderation
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
