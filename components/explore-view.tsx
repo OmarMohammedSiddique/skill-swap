@@ -14,14 +14,66 @@ export default function ExploreView() {
     const [loading, setLoading] = useState(true);
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [searchQuery, setSearchQuery] = useState("");
+    const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [vouchLoading, setVouchLoading] = useState<string | null>(null);
 
     const categories = [
-        { name: "Development", icon: <Code className="w-4 h-4" /> },
-        { name: "Design", icon: <Palette className="w-4 h-4" /> },
-        { name: "Languages", icon: <Languages className="w-4 h-4" /> },
-        { name: "Music", icon: <Music className="w-4 h-4" /> },
-        { name: "Business", icon: <Briefcase className="w-4 h-4" /> },
+        { name: "Development", icon: <Code className="w-4 h-4" />, keywords: ['code', 'dev', 'react', 'js', 'javascript', 'python', 'html', 'css', 'node', 'app', 'web', 'program'] },
+        { name: "Design", icon: <Palette className="w-4 h-4" />, keywords: ['design', 'ui', 'ux', 'figma', 'adobe', 'logo', 'art', 'sketch', 'creative', 'graphic'] },
+        { name: "Languages", icon: <Languages className="w-4 h-4" />, keywords: ['english', 'spanish', 'french', 'german', 'mandarin', 'japanese', 'language', 'speak', 'chinese', 'arabic'] },
+        { name: "Music", icon: <Music className="w-4 h-4" />, keywords: ['music', 'guitar', 'piano', 'voice', 'sing', 'instrument', 'theory', 'drum', 'violin'] },
+        { name: "Business", icon: <Briefcase className="w-4 h-4" />, keywords: ['business', 'market', 'finance', 'startup', 'management', 'sales', 'seo', 'strategy'] },
+    ];
+
+    const dummyProfiles = [
+        {
+            id: "dummy-1",
+            full_name: "Sarah Chen",
+            country: "Singapore",
+            vouch_count: 12,
+            skills: [
+                { id: "d1-s1", skill_name: "React Native", skill_type: "TEACH" },
+                { id: "d1-s2", skill_name: "UI Design", skill_type: "TEACH" },
+                { id: "d1-s3", skill_name: "Japanese", skill_type: "LEARN" }
+            ],
+            is_dummy: true
+        },
+        {
+            id: "dummy-2",
+            full_name: "Marcus Johnson",
+            country: "USA",
+            vouch_count: 8,
+            skills: [
+                { id: "d2-s1", skill_name: "Digital Marketing", skill_type: "TEACH" },
+                { id: "d2-s2", skill_name: "SEO", skill_type: "TEACH" },
+                { id: "d2-s3", skill_name: "Piano", skill_type: "LEARN" }
+            ],
+            is_dummy: true
+        },
+        {
+            id: "dummy-3",
+            full_name: "Elena Rodriguez",
+            country: "Spain",
+            vouch_count: 24,
+            skills: [
+                { id: "d3-s1", skill_name: "Spanish", skill_type: "TEACH" },
+                { id: "d3-s2", skill_name: "Cooking", skill_type: "TEACH" },
+                { id: "d3-s3", skill_name: "Python", skill_type: "LEARN" }
+            ],
+            is_dummy: true
+        },
+        {
+            id: "dummy-4",
+            full_name: "David Kim",
+            country: "South Korea",
+            vouch_count: 5,
+            skills: [
+                { id: "d4-s1", skill_name: "Guitar", skill_type: "TEACH" },
+                { id: "d4-s2", skill_name: "Music Theory", skill_type: "TEACH" },
+                { id: "d4-s3", skill_name: "English", skill_type: "LEARN" }
+            ],
+            is_dummy: true
+        }
     ];
 
     useEffect(() => {
@@ -35,7 +87,6 @@ export default function ExploreView() {
         setCurrentUser(user);
 
         // 2. Fetch Profiles with Skills
-        // Note: This is a simple fetch. For scale, we'd use pagination/filtering on DB side.
         const { data: profilesData, error } = await supabase
             .from('profiles')
             .select(`
@@ -43,10 +94,11 @@ export default function ExploreView() {
                 skills (*)
             `);
         
+        let fetchedProfiles: any[] = [];
+
         if (profilesData) {
-            // 3. Enrich with Vouch Data & Swap Status
-            // We do this client side for now to avoid complex recursive joins if not setup in DB views
-            const enrichedProfiles = await Promise.all(profilesData.map(async (profile) => {
+            // 3. Enrich with Vouch Data
+             fetchedProfiles = await Promise.all(profilesData.map(async (profile) => {
                 // Get Vouch Count
                 const { count } = await supabase
                     .from('vouches')
@@ -57,7 +109,6 @@ export default function ExploreView() {
                 let hasVouched = false;
 
                 if (user && user.id !== profile.id) {
-                    // Check if I have vouched
                     const { data: myVouch } = await supabase
                         .from('vouches')
                         .select('id')
@@ -67,18 +118,7 @@ export default function ExploreView() {
                     
                     hasVouched = !!myVouch;
 
-                    // Check if we have an accepted swap (only if I haven't vouched yet)
                     if (!hasVouched) {
-                        const { data: swaps } = await supabase
-                            .from('swap_requests')
-                            .select('id')
-                            .eq('status', 'accepted')
-                            .or(`requester_id.eq.${user.id},receiver_id.eq.${user.id}`)
-                            .or(`requester_id.eq.${profile.id},receiver_id.eq.${profile.id}`);
-                        
-                        // We need a swap strictly between ME and THEM. 
-                        // The OR query above is a bit loose (gets my swaps AND their swaps), checking intersection manually is safer or precise query.
-                        // Precise: (req=me & rec=them) OR (req=them & rec=me)
                          const { data: exactSwap } = await supabase
                             .from('swap_requests')
                             .select('id')
@@ -99,9 +139,11 @@ export default function ExploreView() {
                     has_vouched: hasVouched
                 };
             }));
-
-            setProfiles(enrichedProfiles);
         }
+
+        // Merge Dummy Data + Real Data
+        // Put dummy data at the end or mix? Let's put at the end for simple "Featured" feel
+        setProfiles([...fetchedProfiles, ...dummyProfiles]);
         setLoading(false);
     };
 
@@ -119,7 +161,6 @@ export default function ExploreView() {
         if (error) {
             alert("Error verifying swap: " + error.message);
         } else {
-            // Optimistic update
             setProfiles(prev => prev.map(p => {
                 if (p.id === targetId) {
                     return {
@@ -137,15 +178,38 @@ export default function ExploreView() {
 
     // Filter Logic
     const filteredProfiles = profiles.filter(p => {
-        // Search by name
-        if (p.full_name?.toLowerCase().includes(searchQuery.toLowerCase())) return true;
+        // 1. Filter by Search Query (Name or Skill Name)
+        if (searchQuery) {
+            const lowerQuery = searchQuery.toLowerCase();
+            const matchesName = p.full_name?.toLowerCase().includes(lowerQuery);
+            const matchesSkill = p.skills?.some((s: any) => s.skill_name.toLowerCase().includes(lowerQuery));
+            if (!matchesName && !matchesSkill) return false;
+        }
+
+        // 2. Filter by Category (Smart Keyword Matching)
+        if (activeCategory) {
+            const category = categories.find(c => c.name === activeCategory);
+            if (category) {
+                 const hasCategorySkill = p.skills?.some((s: any) => 
+                     s.skill_type === 'TEACH' && 
+                     category.keywords.some(k => s.skill_name.toLowerCase().includes(k))
+                 );
+                 if (!hasCategorySkill) return false;
+            }
+        }
         
-        // Search by skills (Teach)
-        const teachSkills = p.skills?.filter((s: any) => s.skill_type === 'TEACH') || [];
-        if (teachSkills.some((s: any) => s.skill_name.toLowerCase().includes(searchQuery.toLowerCase()))) return true;
-        
-        return false;
+        return true;
     });
+
+    const toggleCategory = (catName: string) => {
+        if (activeCategory === catName) {
+            setActiveCategory(null);
+        } else {
+            setActiveCategory(catName);
+            setSearchQuery(""); // Clear search when picking a category for clarity
+        }
+    };
+
 
     return (
         <>
@@ -181,10 +245,10 @@ export default function ExploreView() {
                         {categories.map((cat) => (
                             <Button
                                 key={cat.name}
-                                variant={searchQuery === cat.name ? "default" : "outline"}
+                                variant={activeCategory === cat.name ? "default" : "outline"}
                                 size="sm"
-                                className={`gap-2 rounded-full ${searchQuery === cat.name ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"}`}
-                                onClick={() => setSearchQuery(cat.name)}
+                                className={`gap-2 rounded-full ${activeCategory === cat.name ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"}`}
+                                onClick={() => toggleCategory(cat.name)}
                             >
                                 {cat.icon}
                                 {cat.name}
