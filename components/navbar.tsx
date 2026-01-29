@@ -10,6 +10,17 @@ export default async function Navbar() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  let isAdmin = false;
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single()
+    isAdmin = profile?.is_admin || false;
+  }
+
   return (
     <nav className="border-b bg-background">
       <div className="flex h-16 items-center px-4 max-w-5xl mx-auto container justify-between">
@@ -57,6 +68,14 @@ export default async function Navbar() {
                   Sign Out
                 </Button>
               </form>
+                {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="text-sm font-medium text-indigo-600 hover:underline"
+                >
+                  Admin
+                </Link>
+              )}
             </>
           ) : (
             <Link href="/">

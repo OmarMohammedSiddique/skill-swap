@@ -137,6 +137,16 @@ export default async function Dashboard() {
   // Actually, we might want to show unique CHAINS. 
   // But for simple User Interface, let's just pass the list.
 
+   // Deduplicate Potential Teachers (Key Error Fix)
+  // Ensure each teacher only appears once, even if they match multiple criteria
+  const uniqueTeachersMap = new Map();
+  potentialTeachers.forEach(t => {
+      if (!uniqueTeachersMap.has(t.user_id)) {
+          uniqueTeachersMap.set(t.user_id, t);
+      }
+  });
+  const uniquePotentialTeachers = Array.from(uniqueTeachersMap.values());
+
   // 4. Fetch Requests
   const { data: outgoingRequests } = await supabase
     .from("swap_requests")
@@ -160,7 +170,7 @@ export default async function Dashboard() {
     <DashboardClient
       user={user}
       mySkills={mySkills || []}
-      potentialTeachers={potentialTeachers}
+      potentialTeachers={uniquePotentialTeachers}
       directMatches={directMatches}
       circularMatches={circularMatches}
       outgoingRequests={outgoingRequests || []}

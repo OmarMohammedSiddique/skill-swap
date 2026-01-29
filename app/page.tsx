@@ -75,9 +75,16 @@ const Navbar = ({
       <div className="hidden md:flex items-center gap-6">
         <ThemeToggle className="mr-2" />
         {user ? (
-          <Link href="/dashboard">
-            <Button>Go to Dashboard</Button>
-          </Link>
+          <div className="flex gap-4 items-center">
+             {user.is_admin && (
+                <Link href="/admin">
+                   <Button variant="ghost">Admin</Button>
+                </Link>
+             )}
+            <Link href="/dashboard">
+              <Button>Go to Dashboard</Button>
+            </Link>
+          </div>
         ) : (
           <>
             <Button variant="ghost" className="text-foreground" onClick={() => navigateTo("login")}>
@@ -578,7 +585,12 @@ export default function Home() {
   useEffect(() => {
     async function checkUser() {
         const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
+        if (user) {
+             const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
+             setUser({ ...user, is_admin: profile?.is_admin });
+        } else {
+             setUser(null);
+        }
     }
     checkUser();
   }, [])

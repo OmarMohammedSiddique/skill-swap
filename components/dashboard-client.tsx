@@ -11,6 +11,7 @@ import SwapRequestsList from "@/components/swap-requests-list";
 import MessagesView from "@/components/messages-view";
 
 import { ThemeToggle } from "@/components/theme-toggle";
+import { createClient } from "@/utils/supabase/client";
 
 interface DashboardClientProps {
   user: any;
@@ -32,7 +33,27 @@ export default function DashboardClient({
   incomingRequests,
 }: DashboardClientProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("matches"); // matches | swaps | messages
+  const supabase = createClient();
+  const [activeTab, setActiveTab] = useState("matches"); // matches | swaps | messages | settings
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmation !== "DELETE") return;
+    setIsDeleting(true);
+
+    try {
+        const { error } = await supabase.rpc('delete_user');
+        if (error) throw error;
+        
+        await supabase.auth.signOut();
+        router.push('/');
+    } catch (error: any) {
+        alert("Error deleting account: " + error.message);
+        setIsDeleting(false);
+    }
+  };
 
   const iWantToLearn =
     mySkills?.find((s) => s.skill_type === "LEARN")?.skill_name || "...";
@@ -133,6 +154,13 @@ export default function DashboardClient({
                 onClick={() => setActiveTab('messages')}
               >
                 Messages
+              </Button>
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-start ${activeTab === 'settings' ? 'text-indigo-700 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-300' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                onClick={() => setActiveTab('settings')}
+              >
+                Settings
               </Button>
               <form action="/auth/signout" method="post">
                 <Button
@@ -392,6 +420,71 @@ export default function DashboardClient({
                             <SwapRequestsList requests={incomingRequests} />
                         )}
                     </div>
+                </div>
+            )}
+
+            {activeTab === 'settings' && (
+                <div className="max-w-xl mx-auto space-y-8">
+                     <div>
+                        <h2 className="text-2xl font-bold mb-2 text-slate-900 dark:text-slate-100">Settings</h2>
+                        <p className="text-slate-600 dark:text-slate-400">Manage your account and preferences.</p>
+                     </div>
+
+                     <Card className="border-red-200 bg-red-50 dark:bg-red-900/10 dark:border-red-900/30">
+                        <div className="p-6">
+                            <h3 className="text-lg font-bold text-red-700 dark:text-red-400 mb-2">Danger Zone</h3>
+                            <p className="text-sm text-red-600/80 dark:text-red-400/80 mb-6">
+                                Once you delete your account, there is no going back. Please be certain.
+                            </p>
+                            <Button 
+                                variant="destructive" 
+                                onClick={() => setShowDeleteModal(true)}
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                                Delete Account
+                            </Button>
+                        </div>
+                     </Card>
+                </div>
+            )}
+            
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+                    <Card className="max-w-md w-full p-6 shadow-2xl relative">
+                        <h3 className="text-xl font-bold text-foreground mb-4">Delete Account?</h3>
+                        <p className="text-muted-foreground text-sm mb-6">
+                            This action cannot be undone. This will permanently delete your account and remove your data from our servers.
+                        </p>
+                        
+                        <div className="space-y-4">
+                            <label className="text-sm font-medium text-foreground">
+                                Type <span className="font-mono font-bold">DELETE</span> to confirm
+                            </label>
+                            <input 
+                                className="w-full px-3 py-2 border rounded-md bg-background text-foreground"
+                                value={deleteConfirmation}
+                                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                                placeholder="DELETE"
+                            />
+                        </div>
+
+                        <div className="flex gap-3 mt-6 justify-end">
+                            <Button variant="ghost" onClick={() => {
+                                setShowDeleteModal(false);
+                                setDeleteConfirmation('');
+                            }}>
+                                Cancel
+                            </Button>
+                            <Button 
+                                variant="destructive" 
+                                disabled={deleteConfirmation !== 'DELETE' || isDeleting}
+                                onClick={handleDeleteAccount}
+                            >
+                                {isDeleting ? "Deleting..." : "Confirm Delete"}
+                            </Button>
+                        </div>
+                    </Card>
                 </div>
             )}
 
