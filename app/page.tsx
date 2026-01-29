@@ -434,7 +434,7 @@ const LandingView = ({
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Button
             className="h-12 px-8 text-base bg-white text-slate-900 hover:bg-indigo-50"
-            onClick={() => user ? window.location.href = "/dashboard" : navigateTo("login")}
+            onClick={() => user ? window.location.href = "/dashboard" : window.location.href = "/signup"}
           >
             {user ? "Go to Dashboard" : "Create Free Account"}
           </Button>
@@ -610,17 +610,7 @@ export default function Home() {
   };
 
   const handleSignUp = async () => {
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    if (error) {
-      alert("Signup Error: " + error.message);
-    } else {
-      router.push("/setup");
-    }
-    setLoading(false);
+     window.location.href = '/signup';
   };
 
   const handleLogin = async () => {
